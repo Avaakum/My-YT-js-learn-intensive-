@@ -123,6 +123,90 @@ more.addEventListener('click', () => {
     // до конца не понял что тут происходит, но тут вводится небольшой
     // таймаут для того, чтобы функции работали асинхронно и анимация
     // отображалась
-
+    bindNewModal(card); //за счет помещения сюда функции, которую мы создали
+    //позже, мы вешаем в этот цикл обработчик событий JS, который будет следить за тем
+    // чтобы когда на видео нажимают открывалось модальное окно
   }
+  sliceTitle('.videos__item-descr', 70);
 });
+
+//создаем функцию для обрезания заголовка
+function sliceTitle(selector, count) {
+  document.querySelectorAll(selector).forEach( item => {
+    item.textContent.trim();
+    
+    if(item.textContent.length < count){
+      return;
+    } else {
+      const str = item.textContent.slice(0, count + 1) + "...";
+      item.textContent = str;
+    }
+  });
+}
+
+sliceTitle('.videos__item-descr', 70);
+
+
+// функции открытия/закртытия модального окна
+function openModal() {
+  modal.style.display = 'block';
+}
+
+function closeModal() {
+   modal.style.display = 'none';
+   player.stopVideo();
+}
+
+function bindModal(cards) {
+  cards.forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const id = item.getAttribute('data-url'); //задана переменняid, ее
+      // значение - это атрибут, спец дата атрибут для айди видео
+      loadVideo(id); //загружаем этот id в loadVideo
+      openModal();
+    });
+  });
+}
+bindModal(videos);
+
+function bindNewModal(cards) {
+  cards.addEventListener('click', (e) => {
+    e.preventDefault();
+    const id = cards.getAttribute('data-url'); //задана переменняid, ее
+    // значение - это атрибут, спец дата атрибут для айди видео
+    loadVideo(id); //загружаем этот id в loadVideo
+    openModal();
+  });
+}
+
+modal.addEventListener('click', (e) => {
+  if (!e.target.classList.contains('modal__body')) {
+    closeModal();
+  }
+  
+});
+
+function createVideoPlayer() {
+  var tag = document.createElement('script');
+
+  tag.src = "https://www.youtube.com/iframe_api";
+  var firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+  setTimeout(() => {
+    player = new YT.Player('frame', {
+      height: '100%',
+      width: '100%',
+      videoId: 'M7lc1UVf-VE'
+    });
+  }, 300);
+  
+}
+
+createVideoPlayer();
+
+function loadVideo(id) {
+  player.loadVideoById({'videoId': `${id}`});
+}
+
